@@ -119,10 +119,13 @@ def RuLSIF(x, y, alpha, sigma_range, lambda_range, kernel_num=100, verbose=True)
         divergence = log(g_x).sum(axis=0) / n
         return divergence
 
-    alpha_PE = alpha_PE_divergence(x, y)
-    alpha_KL = alpha_KL_divergence(x, y)
+    alpha_PE = '[not calculated]'
+    alpha_KL = '[not calculated]'
 
     if verbose:
+        alpha_PE = alpha_PE_divergence(x, y)
+        alpha_KL = alpha_KL_divergence(x, y)
+
         print("Approximate alpha-relative PE-divergence = {:03.2f}".format(alpha_PE))
         print("Approximate alpha-relative KL-divergence = {:03.2f}".format(alpha_KL))
 
