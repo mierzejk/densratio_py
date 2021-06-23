@@ -10,7 +10,7 @@ References:
         Journal of Machine Learning Research 10 (2009) 1391-1445.
 """
 
-from numpy import argsort, array, asarray, asmatrix, diag, empty, exp, flip, inf, log, matrix, multiply, nextafter, ones, power, sum
+from numpy import argsort, array, asarray, asmatrix, diag, empty, exp, flip, inf, log, matrix, multiply, nextafter, ones, power, sum, unique
 from numpy.random import randint
 from numpy.linalg import solve
 from warnings import warn
@@ -107,7 +107,8 @@ def RuLSIF(x, y, alpha, sigma_range, lambda_range, kernel_num=100, verbose=True)
         inserted = last_value
         outcome = empty(values.shape, dtype=values.dtype)
 
-        for i in flip(argsort(values)):
+        values_argsort = argsort(values)
+        for i in flip(values_argsort):
             value = values[i]
             if value >= 1.:
                 outcome[i] = value
@@ -125,6 +126,8 @@ def RuLSIF(x, y, alpha, sigma_range, lambda_range, kernel_num=100, verbose=True)
         if not outcome.all():
             warn('Normalized vector contains some zero values.', RuntimeWarning)
 
+        assert unique(values).size == unique(result).size
+        assert (values_argsort == argsort(outcome)).all()
         return outcome
 
 
