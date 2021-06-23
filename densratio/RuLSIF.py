@@ -93,7 +93,7 @@ def RuLSIF(x, y, alpha, sigma_range, lambda_range, kernel_num=100, verbose=True)
         with respect to the natural logarithm.
 
         Arguments:
-            values (numpy.array): .
+            values (numpy.array): A vector to normalize.
 
         Returns:
             Normalized numpy.array object that preserves the order and the number of unique input argument values.
