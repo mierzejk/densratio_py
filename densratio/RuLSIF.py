@@ -89,6 +89,16 @@ def RuLSIF(x, y, alpha, sigma_range, lambda_range, kernel_num=100, verbose=True)
 
     # Normalize values < 1 so the minimum value to replace 0 is symmetrical to alpha^-1 with respect to the natural logarithm.
     def alpha_normalize(values: array) -> array:
+        """
+        Normalizes values less than 1 so the minimum value to replace 0 is symmetrical to alpha^-1
+        with respect to the natural logarithm.
+
+        Arguments:
+            values (numpy.array): .
+
+        Returns:
+            Normalized numpy.array object that preserves the order and the number of unique input argument values.
+        """
         if not alpha:
             return values
 
