@@ -112,6 +112,9 @@ def RuLSIF(x, y, alpha, sigma_range, lambda_range, kernel_num=100, verbose=True)
 
             outcome[i] = inserted
 
+        if not outcome.all():
+            warn('Normalized vector contains some zero values.', RuntimeWarning)
+
         return outcome
 
 
