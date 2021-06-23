@@ -126,7 +126,7 @@ def RuLSIF(x, y, alpha, sigma_range, lambda_range, kernel_num=100, verbose=True)
         if not outcome.all():
             warn('Normalized vector contains some zero values.', RuntimeWarning)
 
-        assert unique(values).size == unique(result).size
+        assert unique(values).size == unique(outcome).size
         assert (values_argsort == argsort(outcome)).all()
         return outcome
 
