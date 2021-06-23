@@ -87,7 +87,6 @@ def RuLSIF(x, y, alpha, sigma_range, lambda_range, kernel_num=100, verbose=True)
 
         return alpha_density_ratio
 
-    # Normalize values < 1 so the minimum value to replace 0 is symmetrical to alpha^-1 with respect to the natural logarithm.
     def alpha_normalize(values: array) -> array:
         """
         Normalizes values less than 1 so the minimum value to replace 0 is symmetrical to alpha^-1
