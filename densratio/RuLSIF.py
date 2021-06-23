@@ -10,7 +10,7 @@ References:
         Journal of Machine Learning Research 10 (2009) 1391-1445.
 """
 
-from numpy import array, asarray, asmatrix, diag, empty, exp, inf, log, matrix, multiply, ones, power, sum
+from numpy import argsort, array, asarray, asmatrix, diag, empty, exp, flip, inf, log, matrix, multiply, nextafter, ones, power, sum
 from numpy.random import randint
 from numpy.linalg import solve
 from warnings import warn
@@ -87,6 +87,34 @@ def RuLSIF(x, y, alpha, sigma_range, lambda_range, kernel_num=100, verbose=True)
 
         return alpha_density_ratio
 
+    # Normalize values < 1 so the minimum value to replace 0 is symmetrical to alpha^-1 with respect to the natural logarithm.
+    def alpha_normalize(values: array) -> array:
+        if not alpha:
+            return values
+
+        a = 1. - alpha
+        last_value = 1.
+        inserted = last_value
+        outcome = empty(values.shape, dtype=values.dtype)
+
+        for i in flip(argsort(values)):
+            value = values[i]
+            if value >= 1.:
+                outcome[i] = value
+                continue
+
+            if value < last_value:
+                new_value = inserted - a * (last_value - value)
+                inserted = nextafter(inserted, 0) if new_value == inserted else new_value
+                last_value = value
+            else:
+                assert value == last_value
+
+            outcome[i] = inserted
+
+        return outcome
+
+
     # Compute the approximate alpha-relative PE-divergence, given samples x and y from the respective distributions.
     def alpha_PE_divergence(x, y):
         # This is Y, in Reference 1.
@@ -112,20 +140,17 @@ def RuLSIF(x, y, alpha, sigma_range, lambda_range, kernel_num=100, verbose=True)
         x = to_numpy_matrix(x)
 
         # Obtain alpha-relative density ratio at these points.
-        g_x = alpha_density_ratio(x)
+        g_x = alpha_normalize(alpha_density_ratio(x))
 
         # Compute the alpha-relative KL-divergence.
         n = x.shape[0]
-        divergence = log(g_x).sum(axis=0) / n
+        divergence = log(g_x).sum(axis=0) / n if g_x.all() else '[not calculated]'
         return divergence
 
-    alpha_PE = '[not calculated]'
-    alpha_KL = '[not calculated]'
+    alpha_PE = alpha_PE_divergence(x, y)
+    alpha_KL = alpha_KL_divergence(x, y)
 
     if verbose:
-        alpha_PE = alpha_PE_divergence(x, y)
-        alpha_KL = alpha_KL_divergence(x, y)
-
         print("Approximate alpha-relative PE-divergence = {:03.2f}".format(alpha_PE))
         print("Approximate alpha-relative KL-divergence = {:03.2f}".format(alpha_KL))
 
