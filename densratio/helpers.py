@@ -48,7 +48,7 @@ def semi_stratified_sample(data: ndarray, samples: int) -> ndarray:
         return np.empty(0)
 
     data_length = data.shape[0]
-    result = np.arange(data_length)
+    result = np.arange(data_length, dtype=int)
     if samples == data_length:
         np.random.shuffle(result)
         return result
@@ -59,7 +59,7 @@ def semi_stratified_sample(data: ndarray, samples: int) -> ndarray:
 
     dims = data.shape[1] if 2 == ndims else 1
     indexed = np.column_stack((data, result))
-    result = np.empty(0, dtype=int)
+    result = np.empty(0, dtype=indexed.dtype)
 
     samples_no = samples // dims
     if samples_no:
@@ -91,4 +91,4 @@ def semi_stratified_sample(data: ndarray, samples: int) -> ndarray:
 
     return np.append(
         result,
-        np.random.choice(indexed[..., dims], size=samples-result.size, replace=False))
+        np.random.choice(indexed[..., dims], size=samples-result.size, replace=False)).astype(int)
