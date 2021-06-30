@@ -63,8 +63,7 @@ def semi_stratified_sample(data: ndarray, samples: int) -> ndarray:
 
     samples_no = samples // dims
     if samples_no:
-        step_size = 100. / samples_no
-        percentiles = np.arange(step_size, 100., step_size)
+        percentiles = np.linspace(0., 100., num=samples_no, endpoint=False)[1:]
 
         for d in range(dims):
             column = indexed[..., d]
