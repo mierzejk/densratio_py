@@ -89,6 +89,8 @@ def semi_stratified_sample(data: ndarray, samples: int) -> ndarray:
             indexed = indexed[~np.isin(indexed[:, dims], indices)]
             result = np.append(result, indices)
 
-    return np.append(
+    result = np.append(
         result,
         np.random.choice(indexed[..., dims], size=samples-result.size, replace=False)).astype(int)
+    np.random.shuffle(result)
+    return result
