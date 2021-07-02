@@ -2,6 +2,7 @@
 import numpy as np
 
 from numpy import array, matrix, ndarray, result_type
+from warnings import warn
 
 
 np_float = result_type(float)
@@ -38,6 +39,50 @@ def to_numpy_matrix(x):
         raise ValueError("Cannot transform to numpy.matrix.")
     else:
         return to_numpy_matrix(array(x))
+
+
+def alpha_normalize(values: array, alpha: float) -> array:
+    """
+    Normalizes values less than 1 so the minimum value to replace 0 is symmetrical to alpha^-1
+    with respect to the natural logarithm.
+
+    Arguments:
+        values (numpy.array): A vector to normalize.
+        alpha (float): The normalization term.
+
+    Returns:
+        Normalized numpy.array object that preserves the order and the number of unique input argument values.
+    """
+    if not alpha:
+        return values
+
+    a = 1. - alpha
+    last_value = 1.
+    inserted = last_value
+    outcome = np.empty(values.shape, dtype=values.dtype)
+
+    values_argsort = np.argsort(values)
+    for i in np.flip(values_argsort):
+        value = values[i]
+        if value >= 1.:
+            outcome[i] = value
+            continue
+
+        if value < last_value:
+            new_value = inserted - a * (last_value - value)
+            inserted = np.nextafter(inserted, 0) if new_value == inserted else new_value
+            last_value = value
+        else:
+            assert value == last_value
+
+        outcome[i] = inserted
+
+    if not outcome.all():
+        warn('Normalized vector contains some zero values.', RuntimeWarning)
+
+    assert np.unique(values).size == np.unique(outcome).size
+    assert (values_argsort == np.argsort(outcome)).all()
+    return outcome
 
 
 def semi_stratified_sample(data: ndarray, samples: int) -> ndarray:

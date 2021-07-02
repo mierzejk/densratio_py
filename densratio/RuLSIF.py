@@ -10,12 +10,12 @@ References:
         Journal of Machine Learning Research 10 (2009) 1391-1445.
 """
 
-from numpy import argsort, array, asarray, asmatrix, diag, empty, exp, flip, inf, log, matrix, multiply, nextafter, ones, power, ravel, sum, unique
-from numpy.random import randint
+from numpy import array, asarray, asmatrix, diag, empty, exp, inf, log, matrix, multiply, ones, power, ravel, sum
 from numpy.linalg import solve
 from warnings import warn
 from .density_ratio import DensityRatio, KernelInfo
 from .helpers import guvectorize_compute, np_float, semi_stratified_sample, to_numpy_matrix
+from .helpers import alpha_normalize as static_alpha_normalize
 
 
 def RuLSIF(x, y, alpha, sigma_range, lambda_range, kernel_num=100, verbose=True):
@@ -99,36 +99,8 @@ def RuLSIF(x, y, alpha, sigma_range, lambda_range, kernel_num=100, verbose=True)
         Returns:
             Normalized numpy.array object that preserves the order and the number of unique input argument values.
         """
-        if not alpha:
-            return values
 
-        a = 1. - alpha
-        last_value = 1.
-        inserted = last_value
-        outcome = empty(values.shape, dtype=values.dtype)
-
-        values_argsort = argsort(values)
-        for i in flip(values_argsort):
-            value = values[i]
-            if value >= 1.:
-                outcome[i] = value
-                continue
-
-            if value < last_value:
-                new_value = inserted - a * (last_value - value)
-                inserted = nextafter(inserted, 0) if new_value == inserted else new_value
-                last_value = value
-            else:
-                assert value == last_value
-
-            outcome[i] = inserted
-
-        if not outcome.all():
-            warn('Normalized vector contains some zero values.', RuntimeWarning)
-
-        assert unique(values).size == unique(outcome).size
-        assert (values_argsort == argsort(outcome)).all()
-        return outcome
+        return static_alpha_normalize(values, alpha)
 
 
     # Compute the approximate alpha-relative PE-divergence, given samples x and y from the respective distributions.
